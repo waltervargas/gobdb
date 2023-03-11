@@ -28,18 +28,3 @@ func TestList(t *testing.T){
 		t.Error(cmp.Diff(want, got))
 	}
 }
-
-// func Add(c gobdb.Collection) {
-// 	f, err := os.Create("tests/list.gobdb")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	defer f.Close()
-
-// 	enc := gob.NewEncoder(f)
-// 	err = enc.Encode(c)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// }
-
