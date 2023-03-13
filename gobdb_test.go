@@ -8,7 +8,6 @@ import (
 )
 
 func TestList(t *testing.T){
-	// opendb
 	db, err := gobdb.Open("tests/list.gobdb")
 	if err != nil {
 		t.Fatalf("unable to open db: %s", err)

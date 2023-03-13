@@ -44,11 +44,12 @@ func Open(path string) (gobdb, error)  {
 	return gobdb{Data: data, path: path}, nil
 }
 
+// List returns the entire database as a map.
 func (db gobdb) List() Data {
 	return db.Data
 }
 
-// Add append a new k,v pair of data to the db and persist data to disk
+// Add append a new key-value pair of data to the db and persist data to disk
 // using the given `path` to Open()
 func (db *gobdb) Add(d Data) error {
 	for k, v := range d {
@@ -58,6 +59,8 @@ func (db *gobdb) Add(d Data) error {
 	if err != nil {
 		return fmt.Errorf("unable to open file: %w", err)
 	}
+	defer file.Close()
+	
 	encoder := gob.NewEncoder(file)
 	err = encoder.Encode(&db.Data)
 	if err != nil {
