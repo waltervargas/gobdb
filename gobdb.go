@@ -61,13 +61,6 @@ func (db *gobdb) Add(d Data) error {
 		//    unable to encode collection: gob: type not registered for interface: []gobdb_test.Todo
 		//
 		gob.Register(v)
-		// WAT?
-		// if I capture the error returned by gob.Register, then this doesn't work: 
-		//
-		//    err := gob.Register(v)
-		//    if err != nil ... 
-		//
-		//	  Error: ./gobdb.go:64:10: gob.Register(v) (no value) used as value
 	}
 	file, err := os.Create(db.path)
 	if err != nil {
