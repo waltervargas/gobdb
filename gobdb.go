@@ -1,3 +1,5 @@
+// Package gobdb provides a simple key-value database for Go binary objects
+// encoded with encoding/gob.
 package gobdb
 
 import (
@@ -15,14 +17,15 @@ type gobdb struct {
 	path string
 }
 
+// Data is a type alias for a map with keys and values of any type.
 type Data map[any]any
 
 // Open opens a file at the specified path and decodes its contents using the
 // gob decoder.
+//
 // If the decoding fails, it returns an error.
-// If the file is empty, it returns an empty collection.
 // If the decoding is successful, it returns a gobdb object with the decoded
-// collection.
+// data.
 func Open(path string) (gobdb, error)  {
 	file, err := os.OpenFile(path, os.O_RDONLY|os.O_CREATE, 0755)
 	if err != nil {
@@ -41,13 +44,11 @@ func Open(path string) (gobdb, error)  {
 	return gobdb{Data: data, path: path}, nil
 }
 
-// List returns the collection stored in the gobdb object.
-// It takes no arguments and returns the collection and an error.
 func (db gobdb) List() Data {
 	return db.Data
 }
 
-// Add append a new object to the collection and persist the collection to disk
+// Add append a new k,v pair of data to the db and persist data to disk
 // using the given `path` to Open()
 func (db *gobdb) Add(d Data) error {
 	for k, v := range d {
