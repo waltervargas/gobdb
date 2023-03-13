@@ -13,16 +13,12 @@ func TestList(t *testing.T){
 	if err != nil {
 		t.Fatalf("unable to open db: %s", err)
 	}
-
-	want := gobdb.Collection{
-		gobdb.Object{
-			Val: []string{"walter","barbara","victor"},
-		},
+	want := gobdb.Data{
+		1: "walter",
+		2: "barbara",
+		3: "victor",
 	}
-	got, err := db.List()
-	if err != nil {
-		t.Error(err)
-	}
+	got := db.List()
 	if !cmp.Equal(want, got){
 		t.Error(cmp.Diff(want, got))
 	}
@@ -34,20 +30,14 @@ func TestAdd(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unable to open db: %s", err)
 	}
-
-	want := gobdb.Collection{
-		gobdb.Object{
-			Val: 42,
-		},
+	want := gobdb.Data{
+		"answer": 42,
 	}
-	err = db.Add(want[0])
+	err = db.Add(want)
 	if err != nil {
 		t.Errorf("unable to add Object %v: %s", want, err)
 	}
-	got, err := db.List()
-	if err != nil {
-		t.Error(err)
-	}
+	got := db.List()
 	if !cmp.Equal(want, got) {
 		t.Error(cmp.Diff(want, got))
 	}
