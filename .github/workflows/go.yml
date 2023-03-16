@@ -1,0 +1,49 @@
+name: go
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint: 
+    runs-on: ubuntu-latest
+    name: Linters for Go
+    steps: 
+      - name: checkout code into Go module dir
+        uses: actions/checkout@v2
+      - name: install go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.20.x
+      - name: linting and vetting
+        env:
+          GOBIN: /tmp/.bin
+        run: make lint
+
+  test:
+    runs-on: ${{ matrix.platform }}
+    strategy:
+      fail-fast: false
+      matrix:
+        go: ['1.18.x', '1.20.x']
+        platform: [ubuntu-latest, macos-latest]
+
+    name: Unit tests on Go ${{ matrix.go }} ${{ matrix.platform }}
+    steps:
+    - name: checkout code into module directory
+      uses: actions/checkout@v2
+      
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: ${{ matrix.go }}
+
+    - uses: actions/cache@v1
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+
+    - name: Run unit tests
+      env:
+        GOBIN: /tmp/.bin
+      run: go test ./...
