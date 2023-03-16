@@ -15,6 +15,8 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: 1.20.x
+      - name: Install staticcheck
+        run: go install honnef.co/go/tools/cmd/staticcheck@latest
       - name: linting and vetting
         env:
           GOBIN: /tmp/.bin
