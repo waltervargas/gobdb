@@ -10,9 +10,9 @@ import (
 	"os"
 )
 
-// gobdb represents a simple key-value database for Go binary objects encoded
+// Gobdb represents a simple key-value database for Go binary objects encoded
 // with encoding/gob.
-type gobdb struct {
+type Gobdb struct {
 	Data Data
 	path string
 	customTypes []any
@@ -21,13 +21,13 @@ type gobdb struct {
 // Data is a type alias for a map with keys and values of any type.
 type Data map[any]any
 
-func WithType(t any) func(*gobdb) {
-	return func(db *gobdb) {
+func WithType(t any) func(*Gobdb) {
+	return func(db *Gobdb) {
 		db.customTypes = append(db.customTypes, t)
 	}
 }
 
-type option func(*gobdb)
+type option func(*Gobdb)
 
 // Open opens a file at the specified path and decodes its contents using the
 // gob decoder.
@@ -35,8 +35,8 @@ type option func(*gobdb)
 // If the decoding fails, it returns an error.
 // If the decoding is successful, it returns a gobdb object with the decoded
 // data.
-func Open(path string, opts ...option) (gobdb, error)  {
-	db := &gobdb{}
+func Open(path string, opts ...option) (Gobdb, error)  {
+	db := &Gobdb{}
 	for _, optf := range opts {
 		optf(db)
 	}
@@ -46,7 +46,7 @@ func Open(path string, opts ...option) (gobdb, error)  {
 
 	file, err := os.OpenFile(path, os.O_RDONLY|os.O_CREATE, 0644)
 	if err != nil {
-		return gobdb{}, err
+		return Gobdb{}, err
 	}
 	defer file.Close()
 
@@ -55,23 +55,23 @@ func Open(path string, opts ...option) (gobdb, error)  {
 	err = decoder.Decode(&data)
 	if err != nil {
 		if !errors.Is(err, io.EOF) {
-			return gobdb{}, err
+			return Gobdb{}, err
 		}
 	}
-	return gobdb{
+	return Gobdb{
 		Data: data,
 		path: path,
 	}, nil
 }
 
 // List returns the entire database as a map.
-func (db gobdb) List() Data {
+func (db Gobdb) List() Data {
 	return db.Data
 }
 
 // Add append a new key-value pair of data to the db and persist data to disk
 // using the given `path` to Open()
-func (db *gobdb) Add(d Data) error {
+func (db *Gobdb) Add(d Data) error {
 	for k, v := range d {
 		// if the caller uses a custom type such as struct as value, then we
 		// need to register this value to gob so it an encode it, otherwise:
