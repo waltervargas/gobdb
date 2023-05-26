@@ -1,3 +1,5 @@
+[![Go Reference](https://pkg.go.dev/badge/github.com/waltervargas/gobdb.svg)](https://pkg.go.dev/github.com/waltervargas/gobdb)[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)[![Go Report Card](https://goreportcard.com/badge/github.com/waltervargas/gobdb)](https://goreportcard.com/report/github.com/waltervargas/gobdb)
+
 # gobdb
 
 gobdb is a simple key-value database for Go binary objects encoded with

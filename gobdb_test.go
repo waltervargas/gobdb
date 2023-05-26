@@ -7,7 +7,7 @@ import (
 	"github.com/waltervargas/gobdb"
 )
 
-func TestList(t *testing.T){
+func TestList(t *testing.T) {
 	t.Parallel()
 	db, err := gobdb.Open[string]("tests/list.gobdb")
 	if err != nil {
@@ -15,7 +15,7 @@ func TestList(t *testing.T){
 	}
 	want := []string{"barbara", "victor", "walter"}
 	got := db.List()
-	if !cmp.Equal(want, got){
+	if !cmp.Equal(want, got) {
 		t.Error(cmp.Diff(want, got))
 	}
 }
