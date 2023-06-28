@@ -108,7 +108,7 @@ func (db Gobdb[T]) List() []T {
 //	during the process, the method returns the error with details about what
 //	went wrong.
 func (db *Gobdb[T]) Add(d ...T) error {
-	file, err := os.Create(db.path)
+	file, err := os.OpenFile(db.path, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 	if err != nil {
 		return fmt.Errorf("unable to open file: %w", err)
 	}
