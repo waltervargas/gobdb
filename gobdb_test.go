@@ -30,7 +30,7 @@ func TestAdd(t *testing.T) {
 	want := []string{"barbara", "victor", "walter"}
 	err = db.Add(want...)
 	if err != nil {
-		t.Errorf("unable to add data %v: %s", want, err)
+		t.Fatalf("unable to add data %v: %s", want, err)
 	}
 	got := db.List()
 	if !cmp.Equal(want, got) {
