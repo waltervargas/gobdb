@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+
+	"golang.org/x/exp/slices"
 )
 
 // Gobdb represents a simple key-value database for Go binary objects encoded
@@ -22,7 +24,7 @@ import (
 //
 //	Data: A slice of type T. It contains the values of the database.
 //	path: A string representing the path to the file where the database is stored.
-type Gobdb[T any] struct {
+type Gobdb[T comparable] struct {
 	Data []T
 	path string
 }
@@ -46,7 +48,7 @@ type Gobdb[T any] struct {
 //	A Gobdb object containing the decoded data, and a nil error if the
 //	operation was successful. If an error occurred, the Gobdb object will
 //	be empty and the error will contain details about what went wrong.
-func Open[T any](path string) (Gobdb[T], error) {
+func Open[T comparable](path string) (Gobdb[T], error) {
 	var t T
 	gob.Register(t)
 
@@ -108,13 +110,17 @@ func (db Gobdb[T]) List() []T {
 //	during the process, the method returns the error with details about what
 //	went wrong.
 func (db *Gobdb[T]) Add(d ...T) error {
-	file, err := os.OpenFile(db.path, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
+	db.Data = append(db.Data, d...)
+	return db.Sync()
+}
+
+func (db *Gobdb[T]) Sync() error {
+	file, err := os.Create(db.path)
 	if err != nil {
 		return fmt.Errorf("unable to open file: %w", err)
 	}
 	defer file.Close()
 
-	db.Data = append(db.Data, d...)
 	encoder := gob.NewEncoder(file)
 	err = encoder.Encode(&db.Data)
 	if err != nil {
@@ -123,3 +129,19 @@ func (db *Gobdb[T]) Add(d ...T) error {
 
 	return nil
 }
+
+
+func (db *Gobdb[T]) Delete(vals ...T) error {
+	var datatmp []T
+	// we keep the db.Data values that are not in vals.
+	for _, v := range db.Data { 	
+		if !slices.Contains(vals, v) {
+			datatmp = append(datatmp, v)
+		}
+	}
+	db.Data = datatmp
+	return db.Sync()
+}
+
+
+// TODO: dumper use a decoder on `any` and writes to io.Writer.
