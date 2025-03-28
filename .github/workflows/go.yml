@@ -21,8 +21,7 @@ on:
       - 'v*'
 
 jobs:
-  lint: 
-    id: lint
+  lint:
     runs-on: ubuntu-latest
     name: Linters for Go
     steps: 
@@ -40,7 +39,6 @@ jobs:
         run: make lint
 
   test:
-    id: test
     runs-on: ${{ matrix.platform }}
     strategy:
       fail-fast: false
