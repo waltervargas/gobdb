@@ -17,8 +17,9 @@ import (
 // its Data field. The path field is unexported and contains the path to the
 // file where the database is stored.
 //
-// The Gobdb type parameter T is constrained by the 'any' type constraint, meaning
-// it can be any Go type.
+// The Gobdb type parameter T is constrained by the 'comparable' type
+// constraint, meaning it can be any comparable Go type. See
+// https://go.dev/ref/spec#Comparison_operators for more information.
 //
 // Fields:
 //
@@ -30,11 +31,11 @@ type Gobdb[T comparable] struct {
 }
 
 // Open is a generic function that opens a file at the specified path and
-// decodes its contents using the gob decoder. The type of the data in the
+// decodes its contents using gob decoder. The type of the data in the
 // file should be specified as the type argument T when calling this function.
 //
-// The type parameter T is constrained by the 'any' type constraint, meaning
-// it can be any Go type.
+// The type parameter T is constrained by the 'comparable' type constraint, meaning
+// it can be any comparable Go type.
 //
 // If the decoding fails, it returns an error. If the decoding is successful,
 // it returns a Gobdb object with the decoded data.
@@ -130,11 +131,10 @@ func (db *Gobdb[T]) Sync() error {
 	return nil
 }
 
-
 func (db *Gobdb[T]) Delete(vals ...T) error {
 	var datatmp []T
 	// we keep the db.Data values that are not in vals.
-	for _, v := range db.Data { 	
+	for _, v := range db.Data {
 		if !slices.Contains(vals, v) {
 			datatmp = append(datatmp, v)
 		}
@@ -143,5 +143,9 @@ func (db *Gobdb[T]) Delete(vals ...T) error {
 	return db.Sync()
 }
 
-
-// TODO: dumper use a decoder on `any` and writes to io.Writer.
+// DeleteAll deletes all values from the database and syncs the changes to
+// the file. It clears the Data slice and writes an empty slice to the file.
+func (db *Gobdb[T]) DeleteAll() error {
+	db.Data = []T{}
+	return db.Sync()
+}

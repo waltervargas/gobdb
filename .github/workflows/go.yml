@@ -3,27 +3,40 @@ name: go
 on:
   pull_request:
     branches: [main]
-    paths-ignore:
-      - '**.md'
-      - '.github/workflows/**'
-      - 'LICENSE'
-      - '.gitignore'
-      - 'docs/**'
   push:
     branches: [main]
-    paths-ignore:
-      - '**.md'
-      - '.github/workflows/**'
-      - 'LICENSE'
-      - '.gitignore'
-      - 'docs/**'
     tags:
       - 'v*'
 
 jobs:
-  lint: 
-    id: lint
+  check_changes:
     runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Check for code changes
+        id: check
+        run: |
+          git diff --name-only HEAD^ HEAD > changes.txt
+          echo "Changed files:"
+          cat changes.txt
+          
+          # Check if there are any changes outside of doc/workflow files
+          if grep -qv -E '(\.md$|\.github/workflows/|LICENSE|\.gitignore|docs/)' changes.txt; then
+            echo "Code changes detected, should run tests"
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          else
+            echo "Only doc changes, skipping tests"
+            echo "should_run=false" >> $GITHUB_OUTPUT
+          fi
+
+  lint:
+    needs: check_changes
+    runs-on: ubuntu-latest
+    if: ${{ needs.check_changes.outputs.should_run == 'true' }}
     name: Linters for Go
     steps: 
       - name: checkout code into Go module dir
@@ -39,15 +52,23 @@ jobs:
           GOBIN: /tmp/.bin
         run: make lint
 
+  skip_lint:
+    needs: check_changes
+    runs-on: ubuntu-latest
+    if: ${{ needs.check_changes.outputs.should_run == 'false' }}
+    steps:
+      - name: Skip lint
+        run: echo "Skipping lint for documentation-only changes"
+
   test:
-    id: test
+    needs: check_changes
+    if: ${{ needs.check_changes.outputs.should_run == 'true' }}
     runs-on: ${{ matrix.platform }}
     strategy:
       fail-fast: false
       matrix:
         go: ['1.24.x']
         platform: [ubuntu-latest, macos-latest]
-
     name: Unit tests on Go ${{ matrix.go }} ${{ matrix.platform }}
     steps:
     - name: checkout code into module directory
@@ -69,3 +90,11 @@ jobs:
       env:
         GOBIN: /tmp/.bin
       run: go test -v ./...
+
+  skip_test:
+    needs: check_changes
+    runs-on: ubuntu-latest
+    if: ${{ needs.check_changes.outputs.should_run == 'false' }}
+    steps:
+      - name: Skip tests
+        run: echo "Skipping tests for documentation-only changes"
