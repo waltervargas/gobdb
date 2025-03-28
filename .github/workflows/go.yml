@@ -3,9 +3,26 @@ name: go
 on:
   pull_request:
     branches: [main]
+    paths-ignore:
+      - '**.md'
+      - '.github/workflows/**'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'docs/**'
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - '.github/workflows/**'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'docs/**'
+    tags:
+      - 'v*'
 
 jobs:
   lint: 
+    id: lint
     runs-on: ubuntu-latest
     name: Linters for Go
     steps: 
@@ -23,6 +40,7 @@ jobs:
         run: make lint
 
   test:
+    id: test
     runs-on: ${{ matrix.platform }}
     strategy:
       fail-fast: false
@@ -44,6 +62,8 @@ jobs:
       with:
         path: ~/go/pkg/mod
         key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
 
     - name: Run unit tests
       env:
