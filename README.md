@@ -11,6 +11,7 @@ encoding/gob.
   gob decoder.
 - List: Returns the entire database as an array.
 - Add: Appends a new value to the database and persist data to disk.
+- Delete: Delete a new value from the database and persist data to disk. 
 
 ## Usage
 ### Open a Database
@@ -63,8 +64,10 @@ system. Here are a few scenarios where it can be handy:
 While gobdb provides a convenient way to work with gob encoded data, there are
 several features that could improve its utility:
 
-- Delete Functionality: Currently, there's no way to delete data from the
+- [X] Delete Functionality: Currently, there's no way to delete data from the
   database. This feature is crucial for managing the data efficiently.
+
+- [ ] Implement an example issue tracker with Gobdb.
 
 - Update Functionality: Another missing feature is the ability to update an
   existing value in the database.
