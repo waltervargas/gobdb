@@ -31,6 +31,7 @@ jobs:
           else
             echo "Only doc changes, skipping tests"
             echo "should_run=false" >> $GITHUB_OUTPUT
+          fi
 
   lint:
     needs: check_changes
@@ -68,7 +69,6 @@ jobs:
       matrix:
         go: ['1.24.x']
         platform: [ubuntu-latest, macos-latest]
-
     name: Unit tests on Go ${{ matrix.go }} ${{ matrix.platform }}
     steps:
     - name: checkout code into module directory
