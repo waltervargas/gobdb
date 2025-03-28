@@ -11,6 +11,7 @@ encoding/gob.
   gob decoder.
 - List: Returns the entire database as an array.
 - Add: Appends a new value to the database and persist data to disk.
+- Delete: Delete a new value from the database and persist data to disk. 
 
 ## Usage
 ### Open a Database
